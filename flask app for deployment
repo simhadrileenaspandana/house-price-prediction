@@ -1,0 +1,23 @@
+from flask import Flask, request, jsonify
+import joblib
+import numpy as np
+
+app = Flask(__name__)
+
+# Load the trained model
+model = joblib.load('house_price_model.pkl')
+
+@app.route('/predict', methods=['GET'])
+def predict():
+    square_feet = float(request.args.get('square_feet'))
+    num_bedrooms = int(request.args.get('num_bedrooms'))
+    num_bathrooms = int(request.args.get('num_bathrooms'))
+
+    # Prepare the feature vector for prediction
+    features = np.array([[square_feet, num_bedrooms, num_bathrooms]])
+    prediction = model.predict(features)[0]
+
+    return jsonify({'predicted_price': prediction})
+
+if __name__ == '__main__':
+    app.run(debug=True)
